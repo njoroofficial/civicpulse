@@ -10,8 +10,10 @@
 
 export default function PublicLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <div className="min-h-screen bg-background">
@@ -26,6 +28,9 @@ export default function PublicLayout({
         </div>
       </header>
       <main>{children}</main>
+      {/* The modal renders on top of everything when a route is intercepted.
+          When no interception is active, Next.js passes null here and nothing renders. */}
+      {modal}
     </div>
   );
 }

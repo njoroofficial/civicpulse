@@ -44,7 +44,6 @@ async function getIssues(): Promise<PlaceholderIssue[]> {
   // Other options: "seconds", "hours", "days", "weeks", "max"
   cacheLife("minutes");
 
-  // In Week 12, this becomes:
   // return await fetch(`${process.env.API_URL}/api/v1/issues`).then(r => r.json())
   return [
     {
