@@ -1,0 +1,31 @@
+// app/(public)/layout.tsx
+// This layout wraps only the public routes: /, /issues, /issues/[id]
+// It adds the public navigation header. Because it's nested inside the
+// root layout, the HTML/body structure is already provided — we only
+// need to add the UI structure specific to public pages.
+
+// Notice: still a Server Component (no "use client").
+// The navigation bar is rendered on the server — no client JavaScript
+// needed just to display a nav bar with links.
+
+export default function PublicLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <span className="font-bold text-lg">🏙️ CivicPulse</span>
+          <nav className="flex gap-4 text-sm">
+            <a href="/issues">Issues</a>
+            <a href="/report">Report Issue</a>
+            <a href="/login">Sign In</a>
+          </nav>
+        </div>
+      </header>
+      <main>{children}</main>
+    </div>
+  );
+}
