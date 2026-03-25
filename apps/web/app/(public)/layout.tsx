@@ -19,11 +19,28 @@ export default function PublicLayout({
     <div className="min-h-screen bg-background">
       <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <span className="font-bold text-lg">🏙️ CivicPulse</span>
+          <a href="/" className="font-bold text-lg">
+            🏙️ CivicPulse
+          </a>
           <nav className="flex gap-4 text-sm">
-            <a href="/issues">Issues</a>
-            <a href="/report">Report Issue</a>
-            <a href="/login">Sign In</a>
+            <a
+              href="/issues"
+              className="hover:text-foreground text-muted-foreground transition-colors"
+            >
+              Issues
+            </a>
+            <a
+              href="/report"
+              className="hover:text-foreground text-muted-foreground transition-colors"
+            >
+              Report Issue
+            </a>
+            <a
+              href="/login"
+              className="hover:text-foreground text-muted-foreground transition-colors"
+            >
+              Sign In
+            </a>
           </nav>
         </div>
       </header>
