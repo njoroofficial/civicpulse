@@ -1,97 +1,92 @@
 // app/(public)/issues/page.tsx
-// The issue list page — accessible at '/issues'.
-//
-// CRITICAL CONCEPT: The "use cache" directive.
-// When you add "use cache" at the top of a file or inside a function,
-// Next.js caches the result of that component/function.
-// The FIRST request renders it fresh, stores the result, and subsequent
-// requests get the cached version instantly — no server round-trip.
-//
-// For CivicPulse, the issue list is a perfect candidate for caching
-// because: (a) it's the most visited page, (b) a slight delay in
-// showing new issues is acceptable, (c) we can invalidate the cache
-// explicitly when a new issue is submitted.
-
-"use cache"; // ← This single directive transforms this into a cached page
+"use cache";
 
 import type { Metadata } from "next";
-import { cacheLife } from "next/cache"; // Next.js 16 cache configuration API
+import { cacheLife } from "next/cache";
+import { IssueCard } from "@/components/issues/IssueCard";
+import type { Issue } from "@civicpulse/shared";
+import { IssueStatus, IssueCategory } from "@civicpulse/shared";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Issues",
   description: "Browse all reported infrastructure issues in Nairobi.",
 };
 
-// Placeholder type — will be replaced with import from @civicpulse/shared
-// once we wire up the package in the next step
-type PlaceholderIssue = {
-  id: string;
-  title: string;
-  category: string;
-  status: string;
-  voteCount: number;
-  location: { ward: string };
-};
-
-// This simulates what we'll eventually fetch from our FastAPI backend
-async function getIssues(): Promise<PlaceholderIssue[]> {
-  // 'use cache' inside a function caches just this function's result,
-  // not the entire component. This is more granular and powerful.
+async function getIssues(): Promise<Issue[]> {
   "use cache";
-
-  // Tell Next.js how long to cache this data.
-  // cacheLife("minutes") = cache for a few minutes before revalidating.
-  // Other options: "seconds", "hours", "days", "weeks", "max"
   cacheLife("minutes");
 
-  // return await fetch(`${process.env.API_URL}/api/v1/issues`).then(r => r.json())
+  // Placeholder data shaped exactly like our shared Issue type
+  // When we wire up FastAPI in Week 12, only this function changes
   return [
     {
       id: "1",
       title: "Large pothole on Ngong Road near Junction Mall",
-      category: "road_infrastructure",
-      status: "pending",
+      description:
+        "A very large and deep pothole approximately 1 metre wide on the southbound lane of Ngong Road, roughly 200m before Junction Mall.",
+      category: IssueCategory.ROAD_INFRASTRUCTURE,
+      status: IssueStatus.PENDING,
+      location: {
+        latitude: -1.2921,
+        longitude: 36.7819,
+        ward: "Kilimani Ward",
+        county: "Nairobi County",
+        address: "Ngong Road, near Junction Mall",
+      },
       voteCount: 234,
-      location: { ward: "Kilimani Ward" },
+      reportedBy: "user-001",
+      photoUrls: ["https://example.com/photo1.jpg"],
+      createdAt: new Date("2026-03-01"),
+      updatedAt: new Date("2026-03-01"),
     },
     {
       id: "2",
-      title: "Water pipe burst — Westlands Avenue",
-      category: "water_sanitation",
-      status: "in_progress",
+      title: "Water pipe burst — Westlands Avenue flooding road",
+      description:
+        "A burst water pipe has been flooding the road for three days causing traffic chaos.",
+      category: IssueCategory.WATER_SANITATION,
+      status: IssueStatus.IN_PROGRESS,
+      location: {
+        latitude: -1.2678,
+        longitude: 36.8034,
+        ward: "Westlands Ward",
+        county: "Nairobi County",
+        address: "Westlands Avenue",
+      },
       voteCount: 187,
-      location: { ward: "Westlands Ward" },
+      reportedBy: "user-002",
+      photoUrls: [],
+      createdAt: new Date("2026-03-02"),
+      updatedAt: new Date("2026-03-03"),
     },
     {
       id: "3",
-      title: "Broken street lights — Hurlingham",
-      category: "electricity",
-      status: "under_review",
+      title: "Broken street lights along entire Hurlingham stretch",
+      description:
+        "All street lights on the main Hurlingham road have been out for two weeks. Very dangerous at night.",
+      category: IssueCategory.ELECTRICITY,
+      status: IssueStatus.UNDER_REVIEW,
+      location: {
+        latitude: -1.2996,
+        longitude: 36.7838,
+        ward: "Dagoretti North Ward",
+        county: "Nairobi County",
+        address: "Hurlingham Road",
+      },
       voteCount: 95,
-      location: { ward: "Dagoretti North Ward" },
+      reportedBy: "user-003",
+      photoUrls: [
+        "https://example.com/photo2.jpg",
+        "https://example.com/photo3.jpg",
+      ],
+      createdAt: new Date("2026-03-05"),
+      updatedAt: new Date("2026-03-05"),
     },
   ];
 }
 
-// A mapping from status strings to human-readable labels and colours.
-// This is a presentation concern — it belongs here, not in the shared types.
-const statusConfig: Record<string, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "bg-yellow-100 text-yellow-800" },
-  under_review: {
-    label: "Under Review",
-    className: "bg-blue-100 text-blue-800",
-  },
-  in_progress: {
-    label: "In Progress",
-    className: "bg-purple-100 text-purple-800",
-  },
-  resolved: { label: "Resolved", className: "bg-green-100 text-green-800" },
-  rejected: { label: "Rejected", className: "bg-red-100 text-red-800" },
-};
-
 export default async function IssuesPage() {
-  // Because getIssues() is cached, this await resolves instantly on
-  // subsequent requests — the component doesn't block on data fetching
   const issues = await getIssues();
 
   return (
@@ -103,50 +98,20 @@ export default async function IssuesPage() {
             {issues.length} issues reported by Nairobi citizens
           </p>
         </div>
-        <a
+        <Link
           href="/report"
           className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
         >
           + Report Issue
-        </a>
+        </Link>
       </div>
 
       <div className="flex flex-col gap-4">
-        {issues.map((issue) => {
-          const status = statusConfig[issue.status] ?? statusConfig.pending;
-          return (
-            <a
-              key={issue.id}
-              href={`/issues/${issue.id}`}
-              className="block p-6 rounded-xl border border-border hover:border-green-300 hover:shadow-sm transition-all"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <h2 className="font-semibold text-lg leading-tight mb-2">
-                    {issue.title}
-                  </h2>
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span>📍 {issue.location.ward}</span>
-                    <span>•</span>
-                    <span className="capitalize">
-                      {issue.category.replace(/_/g, " ")}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                  <span
-                    className={`text-xs font-medium px-2.5 py-1 rounded-full ${status?.className}`}
-                  >
-                    {status?.label}
-                  </span>
-                  <span className="text-sm font-semibold text-green-600">
-                    ▲ {issue.voteCount} votes
-                  </span>
-                </div>
-              </div>
-            </a>
-          );
-        })}
+        {issues.map((issue) => (
+          // IssueCard is a Server Component rendering a Client Component (VoteButton) inside it.
+          // The key prop tells React which list item is which during reconciliation.
+          <IssueCard key={issue.id} issue={issue} />
+        ))}
       </div>
     </div>
   );
