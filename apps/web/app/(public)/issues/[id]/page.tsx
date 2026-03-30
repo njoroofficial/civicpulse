@@ -61,7 +61,7 @@ function getIssueComments(issueId: string): Promise<Comment[]> {
   );
 }
 
-// IssueDetailPage
+// IssueDetail Comment section Page
 function IssueDetailCommentsSection({ issueId }: { issueId: string }) {
   // Start the fetch NOW — do not await it.
   // The Promise begins executing immediately.
@@ -177,8 +177,8 @@ export default async function IssueDetailPage({ params }: PageProps) {
             Vote — This Needs Fixing
           </button>
         </div>
+        <IssueDetailCommentsSection issueId={id} />
       </div>
-      <IssueDetailCommentsSection issueId={id} />
     </div>
   );
 }

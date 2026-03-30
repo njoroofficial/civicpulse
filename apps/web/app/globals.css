@@ -1,26 +1,333 @@
+/* /app/globals.css */
+
+/* ── Import Tailwind v4 ───────────────────────────────────────────────────
+   This single line replaces the three @tailwind directives from v3.
+   It imports the base reset, all utility classes, and the theme system. */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── CivicPulse Design System ────────────────────────────────────────────
+   The @theme directive is the heart of Tailwind v4.
+   Everything defined inside it becomes:
+   1. A CSS custom property (--color-brand-500 etc.) accessible anywhere in CSS
+   2. A Tailwind utility class (bg-brand-500, text-brand-500 etc.) usable in HTML
+   
+   This is the single source of truth for every visual decision in CivicPulse.
+   Change a value here and it propagates everywhere instantly. */
+@theme {
+  /* ── Colour Palette ─────────────────────────────────────────────────────
+     CivicPulse uses a "Nairobi-inspired" palette:
+     - Brand green: drawn from Kenya's landscape — lush, trustworthy, civic
+     - Gold/amber: inspired by Nairobi's golden sunset and warm community spirit
+     - Neutral slate: clean, professional, accessible
+     
+     We define the full scale (50–900) so we have granular control.
+     The naming convention (brand, civic, neutral) carries semantic meaning —
+     'brand' is for identity, 'civic' is for government/official contexts,
+     'neutral' is for text and backgrounds. */
+
+  /* Brand Green — primary identity colour, used for CTAs, links, success states */
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #86efac;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #16a34a; /* ← primary brand colour */
+  --color-brand-700: #15803d;
+  --color-brand-800: #166534;
+  --color-brand-900: #14532d;
+
+  /* Civic Gold — used for official/government contexts, highlights, warnings */
+  --color-civic-50: #fffbeb;
+  --color-civic-100: #fef3c7;
+  --color-civic-200: #fde68a;
+  --color-civic-300: #fcd34d;
+  --color-civic-400: #fbbf24;
+  --color-civic-500: #f59e0b; /* ← primary civic colour */
+  --color-civic-600: #d97706;
+  --color-civic-700: #b45309;
+  --color-civic-800: #92400e;
+  --color-civic-900: #78350f;
+
+  /* Neutral — all text, backgrounds, and borders use this scale */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* ── Semantic Colour Tokens ──────────────────────────────────────────────
+     These are the tokens you actually USE in components — not the raw palette
+     above but meaningful names that describe purpose, not value.
+     
+     This is the critical layer that solves your maintenance problem completely.
+     When a designer says "make the background warmer", you change ONE line here.
+     No component needs to change. This is the power of semantic naming. */
+
+  /* Background colours */
+  --color-background: var(--color-neutral-50);
+  --color-background-card: #ffffff;
+  --color-background-muted: var(--color-neutral-100);
+
+  /* Text colours */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-600);
+  --color-text-muted: var(--color-neutral-400);
+  --color-text-inverse: #ffffff;
+
+  /* Border colours */
+  --color-border: var(--color-neutral-200);
+  --color-border-focus: var(--color-brand-500);
+
+  /* Interactive / Brand tokens */
+  --color-primary: var(--color-brand-600);
+  --color-primary-hover: var(--color-brand-700);
+  --color-primary-text: #ffffff;
+
+  /* Status colours — maps to our IssueStatus enum */
+  --color-status-pending: var(--color-civic-500);
+  --color-status-in-progress: #8b5cf6; /* violet */
+  --color-status-resolved: var(--color-brand-600);
+  --color-status-rejected: #ef4444; /* red */
+
+  /* ── Typography ──────────────────────────────────────────────────────────
+     Defining font families as theme tokens means you change the font
+     for the entire application by editing one line. */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), "Courier New", monospace;
+
+  /* ── Spacing Scale ───────────────────────────────────────────────────────
+     Tailwind v4 inherits a default spacing scale, but we can extend it
+     with project-specific values. CivicPulse uses a slightly generous
+     scale to give content room to breathe on mobile. */
+  --spacing-18: 4.5rem; /* 72px — useful for tall buttons and headers */
+  --spacing-88: 22rem; /* 352px — useful for sidebar widths */
+
+  /* ── Border Radius ───────────────────────────────────────────────────────
+     A consistent radius scale makes the UI feel cohesive.
+     CivicPulse uses 'friendly but professional' — not sharp corners,
+     not bubble-like pill shapes. */
+  --radius-sm: 0.375rem; /* 6px  — badges, tags */
+  --radius-md: 0.5rem; /* 8px  — inputs, small cards */
+  --radius-lg: 0.75rem; /* 12px — cards, panels */
+  --radius-xl: 1rem; /* 16px — modals, large containers */
+
+  /* ── Shadows ─────────────────────────────────────────────────────────────
+     Subtle, single-layer shadows. We avoid heavy multi-layer shadows
+     that feel dated. These shadows use a green tint to reinforce brand identity. */
+  --shadow-card:
+    0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover:
+    0 4px 6px -1px rgb(22 163 74 / 0.08), 0 2px 4px -2px rgb(22 163 74 / 0.06);
+
+  /* ── Animation ───────────────────────────────────────────────────────────
+     Consistent animation durations create a coherent feel across interactions. */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ── Dark Mode ───────────────────────────────────────────────────────────────
+   Tailwind v4 uses the 'class' strategy for dark mode by default.
+   When the <html> element has the class 'dark', these overrides take effect.
+   We only override the semantic tokens — the raw palette stays the same.
+   This is the beauty of the two-layer approach: light/dark mode is just
+   remapping semantic tokens to different palette values. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-background: var(--color-neutral-900);
+    --color-background-card: var(--color-neutral-800);
+    --color-background-muted: var(--color-neutral-800);
+
+    --color-text-primary: var(--color-neutral-50);
+    --color-text-secondary: var(--color-neutral-400);
+    --color-text-muted: var(--color-neutral-600);
+
+    --color-border: var(--color-neutral-700);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Base Styles ─────────────────────────────────────────────────────────────
+   The @layer base directive adds styles to Tailwind's base layer —
+   they apply globally but can be overridden by utility classes.
+   Think of this as a more intentional version of a CSS reset. */
+@layer base {
+  /* Apply the semantic background and text colours to the document root.
+     Every component inherits these unless it overrides them explicitly. */
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    /* font-feature-settings improves readability at small sizes by
+       enabling ligatures and contextual alternates in supported fonts */
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Consistent focus styles — critical for keyboard accessibility.
+     The default browser focus ring is inconsistent across browsers.
+     This gives every focusable element a clean, brand-coloured ring. */
+  *:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Remove the default focus ring on elements that have focus-visible,
+     because focus-visible only shows when navigating via keyboard */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* ── Component Layer ─────────────────────────────────────────────────────────
+   The @layer components directive is where you define reusable component
+   classes — patterns that appear frequently enough to warrant a single class
+   rather than repeated utility strings.
+   
+   IMPORTANT: This is NOT where you put component-specific styles.
+   It is for design system primitives that appear across many components.
+   Component-specific styles still live in the component files as utility classes. */
+@layer components {
+  /* The card primitive — the most common surface in CivicPulse's UI.
+     Every issue card, stats panel, and modal uses this pattern.
+     Defining it once here means changing the card style is one edit. */
+  .card {
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-hover {
+    transition:
+      border-color var(--duration-normal) ease,
+      box-shadow var(--duration-normal) ease;
+  }
+
+  .card-hover:hover {
+    border-color: var(--color-brand-300);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* The primary button — used for all main call-to-action buttons.
+     Rather than writing 'bg-brand-600 text-white px-6 py-3 rounded-lg
+     hover:bg-brand-700 transition-colors' in every button, one class
+     captures the whole pattern. */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--color-primary);
+    color: var(--color-primary-text);
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition:
+      background-color var(--duration-fast) ease,
+      transform var(--duration-fast) ease;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* The outline button variant — for secondary actions */
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color var(--duration-fast) ease;
+    cursor: pointer;
+  }
+
+  .btn-outline:hover {
+    background-color: var(--color-brand-50);
+  }
+
+  /* Form input primitive — applied to all text inputs, textareas, selects */
+  .input {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    background-color: var(--color-background-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    transition:
+      border-color var(--duration-fast) ease,
+      box-shadow var(--duration-fast) ease;
+  }
+
+  .input:focus {
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 3px rgb(34 197 94 / 0.15);
+    outline: none;
+  }
+
+  .input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  /* Container — a max-width wrapper that keeps content readable on wide screens */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+}
+
+/* ── Utility Layer ────────────────────────────────────────────────────────────
+   Custom utilities that extend Tailwind's built-in set.
+   These follow Tailwind's naming convention so they feel native. */
+@layer utilities {
+  /* Text balance — improves heading readability by preventing
+     awkward single-word last lines */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Visually hidden — removes from visual display but keeps
+     accessible to screen readers. Used for sr-only content. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
 }

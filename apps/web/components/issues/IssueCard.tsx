@@ -25,32 +25,22 @@ export function IssueCard({ issue, variant = "list" }: IssueCardProps) {
   const isFeatured = variant === "featured";
 
   return (
-    <article
-      className={`
-        group bg-background rounded-xl border border-border
-        hover:border-green-300 hover:shadow-sm
-        transition-all duration-200
-        ${isFeatured ? "p-8" : "p-6"}
-      `}
-      // Semantic HTML — 'article' correctly identifies this as a
-      // self-contained piece of content, which helps screen readers
-      // and search engine crawlers understand the page structure
-    >
+    <article className={`card card-hover group ${isFeatured ? "p-8" : "p-6"}`}>
       {/* Card header — title row with status badge */}
       <div className="flex items-start justify-between gap-4 mb-3">
         <Link
           href={`/issues/${issue.id}`}
           className={`
-            font-semibold leading-tight hover:text-green-700 transition-colors
+            font-semibold leading-tight transition-colors
+            group-hover:text-(--color-brand-600)
             ${isFeatured ? "text-2xl" : "text-lg"}
           `}
+          style={{ color: "var(--color-text-primary)" }}
         >
           {/* group-hover on the parent article applies a style to this link
               when the CARD is hovered — not just the link itself.
               This makes the entire card feel clickable. */}
-          <span className="group-hover:text-green-700 transition-colors">
-            {issue.title}
-          </span>
+          {issue.title}
         </Link>
         <div className="shrink-0">
           <StatusBadge status={issue.status} size={isFeatured ? "md" : "sm"} />
@@ -59,7 +49,10 @@ export function IssueCard({ issue, variant = "list" }: IssueCardProps) {
 
       {/* Description — only shown in featured variant */}
       {isFeatured && issue.description && (
-        <p className="text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+        <p
+          className="leading-relaxed mb-4 line-clamp-3"
+          style={{ color: "var(--color-text-secondary)" }}
+        >
           {issue.description}
         </p>
       )}
@@ -68,7 +61,10 @@ export function IssueCard({ issue, variant = "list" }: IssueCardProps) {
       <div className="flex items-center gap-4 mb-4">
         <CategoryTag category={issue.category} />
         {issue.location.ward && (
-          <span className="text-sm text-muted-foreground flex items-center gap-1">
+          <span
+            className="text-sm flex items-center gap-1"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             <span aria-hidden="true">📍</span>
             {issue.location.ward}
           </span>
@@ -76,16 +72,18 @@ export function IssueCard({ issue, variant = "list" }: IssueCardProps) {
       </div>
 
       {/* Card footer — vote button + additional metadata */}
-      <div className="flex items-center justify-between pt-3 border-t border-border">
-        {/* VoteButton is a Client Component — it receives primitives as props,
-            not the entire Issue object. We only pass what it needs.
-            This is the "minimal props" principle — don't pass entire objects
-            when you only need a couple of fields. */}
+      <div
+        className="flex items-center justify-between pt-3 border-t"
+        style={{ borderColor: "var(--color-border)" }}
+      >
         <VoteButton issueId={issue.id} initialVoteCount={issue.voteCount} />
 
         {/* Photo count indicator — if the issue has photos attached */}
         {issue.photoUrls.length > 0 && (
-          <span className="text-xs text-muted-foreground flex items-center gap-1">
+          <span
+            className="text-xs flex items-center gap-1"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             <span aria-hidden="true">📷</span>
             {issue.photoUrls.length} photo
             {issue.photoUrls.length !== 1 ? "s" : ""}
