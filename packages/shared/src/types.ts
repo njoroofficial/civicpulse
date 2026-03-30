@@ -188,7 +188,6 @@ export interface Notification extends BaseEntity {
   isRead: boolean;
 }
 
-
 // ─────────────────────────────────────────────────────────────
 // API RESPONSE WRAPPERS
 // The 'T' is a type parameter — a placeholder that gets filled
@@ -204,16 +203,16 @@ export interface ApiResponse<T> {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  total: number;               // total records in the DB matching the query
+  total: number; // total records in the DB matching the query
   page: number;
   pageSize: number;
   hasNextPage: boolean;
-  cursor?: string;             // for cursor-based pagination (Week 18)
+  cursor?: string; // for cursor-based pagination (Week 18)
 }
 
 export interface ApiError {
   error: string;
-  code: string;                // e.g. "ISSUE_NOT_FOUND", "UNAUTHORIZED"
+  code: string; // e.g. "ISSUE_NOT_FOUND", "UNAUTHORIZED"
   details?: Record<string, string[]>; // validation errors per field
 }
 
@@ -228,20 +227,28 @@ export interface ApiError {
 
 // What the frontend sends when creating a new issue
 // We omit all the fields the server generates
-export type CreateIssueDto = Omit
+export type CreateIssueDto = Omit<
   Issue,
-  "id" | "createdAt" | "updatedAt" | "reportedBy" |
-  "voteCount" | "assignedTo" | "assignedAt" | "aiCategory" | "isDuplicate" | "duplicateOfId"
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "reportedBy"
+  | "voteCount"
+  | "assignedTo"
+  | "assignedAt"
+  | "aiCategory"
+  | "isDuplicate"
+  | "duplicateOfId"
 >;
 
 // What an official sends when updating an issue's status
 export type UpdateIssueStatusDto = Pick<Issue, "status"> & {
-  note?: string;               // optional explanation (goes into AuditLog)
+  note?: string; // optional explanation (goes into AuditLog)
 };
 
 // A lightweight version of Issue for the map view —
 // we don't need description or photos, just enough to render a pin
-export type IssueMapPin = Pick
+export type IssueMapPin = Pick<
   Issue,
   "id" | "title" | "category" | "status" | "location" | "voteCount"
 >;

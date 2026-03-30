@@ -10,6 +10,9 @@
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { IssueComments } from "@/components/issues/IssueComments";
+import type { Comment } from "@civicpulse/shared";
 
 // Next.js 16: params is now a Promise — you must await it.
 // This was one of the breaking changes from Next.js 14→15→16.
@@ -30,6 +33,66 @@ export async function generateMetadata({
     title: `Issue #${id}`,
     description: `View details and status of community issue #${id}`,
   };
+}
+
+// This function returns a Promise — it does NOT await it.
+// The Promise starts executing immediately when called,
+// but we pass the unfulfilled Promise to the Client Component.
+// This means the HTTP fetch and the component tree rendering happen in parallel.
+function getIssueComments(issueId: string): Promise<Comment[]> {
+  // In Week 12 this becomes: fetch(`${API_URL}/api/v1/issues/${issueId}/comments`)
+  return new Promise((resolve) =>
+    setTimeout(
+      () =>
+        resolve([
+          {
+            id: "c1",
+            issueId,
+            authorId: "official-001",
+            content:
+              "We have logged this issue and assigned it to the Roads Department. A team will inspect the site within 48 hours.",
+            isOfficialUpdate: true,
+            createdAt: new Date("2026-03-03"),
+            updatedAt: new Date("2026-03-03"),
+          },
+        ]),
+      800, // simulating a slightly slow comments fetch
+    ),
+  );
+}
+
+// IssueDetailPage
+function IssueDetailCommentsSection({ issueId }: { issueId: string }) {
+  // Start the fetch NOW — do not await it.
+  // The Promise begins executing immediately.
+  const commentsPromise = getIssueComments(issueId);
+
+  return (
+    <section className="mt-8">
+      <h2 className="text-lg font-semibold mb-4">
+        Official Updates & Comments
+      </h2>
+      {/* Suspense here is the manual version of what loading.tsx does automatically.
+          We use it inline when we want a loading state for one specific section
+          of a page, rather than the whole page.
+          While IssueComments is suspended (Promise pending), the fallback renders. */}
+      <Suspense
+        fallback={
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <div key={i} className="p-4 rounded-lg border border-border">
+                <div className="bg-muted animate-pulse rounded h-4 w-3/4 mb-2" />
+                <div className="bg-muted animate-pulse rounded h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        }
+      >
+        {/* commentsPromise is passed as a prop — IssueComments uses use() to read it */}
+        <IssueComments commentsPromise={commentsPromise} />
+      </Suspense>
+    </section>
+  );
 }
 
 export default async function IssueDetailPage({ params }: PageProps) {
@@ -115,6 +178,7 @@ export default async function IssueDetailPage({ params }: PageProps) {
           </button>
         </div>
       </div>
+      <IssueDetailCommentsSection issueId={id} />
     </div>
   );
 }
