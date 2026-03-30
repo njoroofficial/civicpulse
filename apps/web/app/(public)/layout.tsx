@@ -8,6 +8,9 @@
 // The navigation bar is rendered on the server — no client JavaScript
 // needed just to display a nav bar with links.
 
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import Link from "next/link";
+
 export default function PublicLayout({
   children,
   modal,
@@ -16,37 +19,56 @@ export default function PublicLayout({
   modal: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border sticky top-0 z-50 bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <a href="/" className="font-bold text-lg">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: "var(--color-background)" }}
+    >
+      <header
+        className="border-b sticky top-0 z-50 backdrop-blur"
+        style={{
+          borderColor: "var(--color-border)",
+          backgroundColor:
+            "color-mix(in srgb, var(--color-background) 95%, transparent)",
+        }}
+      >
+        <div className="container h-16 flex items-center justify-between">
+          <Link
+            href="/"
+            className="font-bold text-lg"
+            style={{ color: "var(--color-text-primary)" }}
+          >
             🏙️ CivicPulse
-          </a>
-          <nav className="flex gap-4 text-sm">
-            <a
+          </Link>
+
+          <nav className="flex items-center gap-6">
+            <Link
               href="/issues"
-              className="hover:text-foreground text-muted-foreground transition-colors"
+              className="text-sm transition-colors hover:text-(--color-brand-600)"
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Issues
-            </a>
-            <a
+            </Link>
+            <Link
               href="/report"
-              className="hover:text-foreground text-muted-foreground transition-colors"
+              className="text-sm transition-colors hover:text-(--color-brand-600)"
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Report Issue
-            </a>
-            <a
+            </Link>
+            <Link
               href="/login"
-              className="hover:text-foreground text-muted-foreground transition-colors"
+              className="text-sm transition-colors hover:text-(--color-brand-600)"
+              style={{ color: "var(--color-text-secondary)" }}
             >
               Sign In
-            </a>
+            </Link>
+
+            <ThemeToggle />
           </nav>
         </div>
       </header>
+
       <main>{children}</main>
-      {/* The modal renders on top of everything when a route is intercepted.
-          When no interception is active, Next.js passes null here and nothing renders. */}
       {modal}
     </div>
   );

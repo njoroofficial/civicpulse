@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeScript } from "@/components/layout/ThemeScript";
 
 // next/font automatically downloads and optimises fonts at build time.
 // They're self-hosted — no external request to Google Fonts at runtime,
@@ -40,21 +42,18 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode; // 'children' is whatever page.tsx renders
+  children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      /*
-        suppressHydrationWarning on <html> prevents a React warning when
-        browser extensions (like dark mode extensions) modify the DOM before
-        React can hydrate. Without it, you'd see constant "hydration mismatch"
-        warnings in development that aren't actually your bugs.
-      */
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

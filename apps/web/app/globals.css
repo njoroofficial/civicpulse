@@ -139,17 +139,26 @@
    This is the beauty of the two-layer approach: light/dark mode is just
    remapping semantic tokens to different palette values. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --color-background: var(--color-neutral-900);
     --color-background-card: var(--color-neutral-800);
     --color-background-muted: var(--color-neutral-800);
-
     --color-text-primary: var(--color-neutral-50);
     --color-text-secondary: var(--color-neutral-400);
     --color-text-muted: var(--color-neutral-600);
-
     --color-border: var(--color-neutral-700);
   }
+}
+
+/* Manual override — applies when ThemeProvider adds the 'dark' class to <html> */
+html.dark {
+  --color-background: var(--color-neutral-900);
+  --color-background-card: var(--color-neutral-800);
+  --color-background-muted: var(--color-neutral-800);
+  --color-text-primary: var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-400);
+  --color-text-muted: var(--color-neutral-600);
+  --color-border: var(--color-neutral-700);
 }
 
 /* ── Base Styles ─────────────────────────────────────────────────────────────
