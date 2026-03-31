@@ -9,6 +9,7 @@
 // fully-rendered HTML, not a loading spinner followed by data.
 
 import type { Metadata } from "next";
+import { Hero } from "@/components/layout/Hero";
 
 // The 'metadata' export overrides the root layout's default metadata
 // specifically for this page. The title template means this renders as
@@ -21,67 +22,12 @@ export default async function HomePage() {
   // In a few weeks, this will fetch real data from our FastAPI backend.
   // For now, we hardcode placeholder data to establish the component structure.
   // The shape of this data matches our Issue type from @civicpulse/shared.
-  const stats = {
-    totalIssues: 1247,
-    resolvedIssues: 834,
-    activeVoters: 5621,
-  };
 
-  return (
-    <div className="container mx-auto px-4 py-16">
-      {/* Hero Section */}
-      <section className="text-center mb-16">
-        <h1 className="text-5xl font-bold tracking-tight mb-4">
-          Your city. Your voice.
-          <br />
-          <span className="text-green-600">Your responsibility.</span>
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          Report infrastructure issues in Nairobi, vote on what matters most to
-          your community, and watch the government resolve them — transparently,
-          in real time.
-        </p>
-        <div className="flex gap-4 justify-center">
-          <a
-            href="/report"
-            className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors"
-          >
-            Report an Issue
-          </a>
-          <a
-            href="/issues"
-            className="border border-border px-6 py-3 rounded-lg font-medium hover:bg-accent transition-colors"
-          >
-            View All Issues
-          </a>
-        </div>
-      </section>
+  const stats = [
+    { value: "1,247", label: "Issues Reported" },
+    { value: "834", label: "Resolved" },
+    { value: "5,621", label: "Active Citizens" },
+  ];
 
-      {/* Stats Section — server-rendered, no loading state needed */}
-      <section className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
-        <div className="text-center p-6 rounded-xl border border-border">
-          <div className="text-3xl font-bold text-green-600">
-            {stats.totalIssues.toLocaleString()}
-          </div>
-          <div className="text-sm text-muted-foreground mt-1">
-            Issues Reported
-          </div>
-        </div>
-        <div className="text-center p-6 rounded-xl border border-border">
-          <div className="text-3xl font-bold text-green-600">
-            {stats.resolvedIssues.toLocaleString()}
-          </div>
-          <div className="text-sm text-muted-foreground mt-1">Resolved</div>
-        </div>
-        <div className="text-center p-6 rounded-xl border border-border">
-          <div className="text-3xl font-bold text-green-600">
-            {stats.activeVoters.toLocaleString()}
-          </div>
-          <div className="text-sm text-muted-foreground mt-1">
-            Active Citizens
-          </div>
-        </div>
-      </section>
-    </div>
-  );
+  return <Hero stats={stats} />;
 }
