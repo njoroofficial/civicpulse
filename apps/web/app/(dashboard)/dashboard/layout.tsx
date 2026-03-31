@@ -6,6 +6,11 @@
 // All three render simultaneously, each with their own Suspense boundary.
 // If @issuetable is slow, @stats still renders — they're independent.
 
+"use client";
+
+import { useEffect } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
+
 export default function DashboardLayout({
   children,
   stats,
@@ -15,16 +20,38 @@ export default function DashboardLayout({
   stats: React.ReactNode;
   issuetable: React.ReactNode;
 }) {
+  const { setTheme, theme } = useTheme();
+
+  useEffect(() => {
+    const previousTheme = theme;
+
+    setTheme("light");
+
+    return () => {
+      setTheme(previousTheme);
+    };
+  }, [setTheme]);
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div
+      className="min-h-screen"
+      style={{ backgroundColor: "var(--color-background)" }}
+    >
       {/* Dashboard header */}
-      <header className="border-b border-border bg-background sticky top-0 z-50">
-        <div className="container mx-auto px-6 h-14 flex items-center gap-4">
-          <a href="/" className="font-bold text-lg">
-            🏙️ CivicPulse
-          </a>
-          <span className="text-muted-foreground">/</span>
-          <span className="text-sm font-medium">Officials Dashboard</span>
+      <header
+        className="border-b sticky top-0 z-50"
+        style={{ borderColor: "var(--color-border)" }}
+      >
+        <div className="container h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="font-bold">🏙️ CivicPulse</span>
+            <span style={{ color: "var(--color-text-muted)" }}>/</span>
+            <span
+              className="text-sm font-medium"
+              style={{ color: "var(--color-text-secondary)" }}
+            >
+              Officials Dashboard
+            </span>
+          </div>
         </div>
       </header>
 
