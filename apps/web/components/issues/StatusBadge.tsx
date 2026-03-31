@@ -6,34 +6,49 @@
 
 import { IssueStatus } from "@civicpulse/shared";
 
-const statusConfig: Record<IssueStatus, { label: string; style: string }> = {
+const statusConfig: Record<IssueStatus, { label: string; style: React.CSSProperties }> = {
   pending: {
     label: "Pending",
     // We use inline style for semantic tokens to ensure the CSS variable
     // is read at runtime — this is the recommended pattern in Tailwind v4
     // when using your own custom semantic tokens
-    style:
-      "background-color: color-mix(in srgb, var(--color-civic-500) 15%, transparent); color: var(--color-civic-700); border: 1px solid color-mix(in srgb, var(--color-civic-500) 25%, transparent);",
+    style: {
+      backgroundColor: "color-mix(in srgb, var(--color-civic-500) 15%, transparent)",
+      color: "var(--color-civic-700)",
+      border: "1px solid color-mix(in srgb, var(--color-civic-500) 25%, transparent)",
+    },
   },
   under_review: {
     label: "Under Review",
-    style:
-      "background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;",
+    style: {
+      backgroundColor: "#eff6ff",
+      color: "#1d4ed8",
+      border: "1px solid #bfdbfe",
+    },
   },
   in_progress: {
     label: "In Progress",
-    style:
-      "background-color: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe;",
+    style: {
+      backgroundColor: "#f5f3ff",
+      color: "#6d28d9",
+      border: "1px solid #ddd6fe",
+    },
   },
   resolved: {
     label: "Resolved",
-    style:
-      "background-color: color-mix(in srgb, var(--color-brand-500) 12%, transparent); color: var(--color-brand-700); border: 1px solid color-mix(in srgb, var(--color-brand-500) 25%, transparent);",
+    style: {
+      backgroundColor: "color-mix(in srgb, var(--color-brand-500) 12%, transparent)",
+      color: "var(--color-brand-700)",
+      border: "1px solid color-mix(in srgb, var(--color-brand-500) 25%, transparent)",
+    },
   },
   rejected: {
     label: "Rejected",
-    style:
-      "background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca;",
+    style: {
+      backgroundColor: "#fef2f2",
+      color: "#dc2626",
+      border: "1px solid #fecaca",
+    },
   },
 };
 
@@ -50,7 +65,7 @@ export function StatusBadge({ status, size = "md" }: StatusBadgeProps) {
   return (
     <span
       className={`inline-flex items-center font-medium rounded-full ${sizeClass}`}
-      style={{ cssText: config.style } as React.CSSProperties}
+      style={config.style}
     >
       {config.label}
     </span>

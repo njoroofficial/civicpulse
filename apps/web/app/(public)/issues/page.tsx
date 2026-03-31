@@ -3,10 +3,12 @@
 
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
+import { Suspense } from "react";
+import Link from "next/link";
 import { IssueCard } from "@/components/issues/IssueCard";
+import { LiveIssueFeed } from "@/components/issues/LiveIssueFeed";
 import type { Issue } from "@civicpulse/shared";
 import { IssueStatus, IssueCategory } from "@civicpulse/shared";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Issues",
@@ -90,28 +92,53 @@ export default async function IssuesPage() {
   const issues = await getIssues();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Community Issues</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1
+            className="text-3xl font-bold"
+            style={{ color: "var(--color-text-primary)" }}
+          >
+            Community Issues
+          </h1>
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             {issues.length} issues reported by Nairobi citizens
           </p>
         </div>
-        <Link
-          href="/report"
-          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
-        >
+        <Link href="/report" className="btn-primary">
           + Report Issue
         </Link>
       </div>
 
-      <div className="flex flex-col gap-4">
-        {issues.map((issue) => (
-          // IssueCard is a Server Component rendering a Client Component (VoteButton) inside it.
-          // The key prop tells React which list item is which during reconciliation.
-          <IssueCard key={issue.id} issue={issue} />
-        ))}
+      {/*
+        Two-column layout on larger screens — live feed in a sidebar,
+        full issue list in the main column.
+        On mobile (small screens), the live feed stacks above the list.
+      */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
+        {/* Main column — cached, server-rendered issue list */}
+        <div className="flex flex-col gap-4">
+          {issues.map((issue) => (
+            <IssueCard key={issue.id} issue={issue} />
+          ))}
+        </div>
+
+        {/* Sidebar — real-time live feed */}
+        {/* This entire aside is NOT cached — it is a Client Component that
+            establishes its own SSE connection. The page itself is cached,
+            but this section is excluded from the cache because it has
+            the "use client" directive in its component definition. 
+            
+            Next.js 16 handles this correctly: the cached page HTML omits
+            the LiveIssueFeed output (it renders as an empty placeholder),
+            and the client hydrates and starts the SSE connection.
+            This is the Cache Components model working exactly as intended. */}
+        <aside className="lg:sticky lg:top-24">
+          <LiveIssueFeed />
+        </aside>
       </div>
     </div>
   );
