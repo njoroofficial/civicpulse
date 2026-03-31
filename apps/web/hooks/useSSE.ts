@@ -32,6 +32,12 @@ type SSEState = {
   reconnectCount: number;
 };
 
+function calculateBackoffWithJitter(reconnectCount: number): number {
+  const baseBackoff = Math.min(1000 * Math.pow(2, reconnectCount), 30000);
+  const jitter = Math.random() * baseBackoff;
+  return Math.floor(jitter);
+}
+
 export function useSSE<T>({
   url,
   eventName,
@@ -54,6 +60,7 @@ export function useSSE<T>({
   const onMessageRef = useRef(onMessage);
   const onConnectRef = useRef(onConnect);
   const onDisconnectRef = useRef(onDisconnect);
+  const reconnectCountRef = useRef(0);
 
   // Keep refs current on every render without re-running the effect
   onMessageRef.current = onMessage;
@@ -90,6 +97,7 @@ export function useSSE<T>({
       });
 
       eventSource.addEventListener("error", () => {
+        reconnectCountRef.current += 1;
         setState((prev) => ({
           isConnected: false,
           error: "Connection lost. Reconnecting...",
@@ -98,19 +106,13 @@ export function useSSE<T>({
         onDisconnectRef.current?.();
 
         // EventSource has built-in reconnection, but it uses a fixed 3-second
-        // interval. We implement exponential backoff ourselves for better
-        // behaviour under sustained server unavailability.
-        // The browser will attempt its own reconnection automatically —
-        // we close the current connection and reopen after our backoff delay
-        // to take control of the timing.
+        // interval. We implement exponential backoff with jitter ourselves for
+        // better behaviour under sustained server unavailability.
+        // Jitter spreads reconnection attempts across clients so they don't all
+        // hammer the server at the same moment after an outage.
         eventSource.close();
 
-        // Exponential backoff: 2s, 4s, 8s, max 30s
-        // Math.min ensures we cap at 30 seconds
-        const backoffMs = Math.min(
-          1000 * Math.pow(2, state.reconnectCount),
-          30000,
-        );
+        const backoffMs = calculateBackoffWithJitter(reconnectCountRef.current);
         reconnectTimeout = setTimeout(connect, backoffMs);
       });
     }
@@ -123,6 +125,7 @@ export function useSSE<T>({
     return () => {
       clearTimeout(reconnectTimeout);
       eventSource?.close();
+      reconnectCountRef.current = 0;
       setState({ isConnected: false, error: null, reconnectCount: 0 });
     };
 
